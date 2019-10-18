@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.ML;
 using Microsoft.Spark.Sql;
 using SentimentAnalysisML.Model;
 
@@ -8,29 +9,28 @@ namespace SentinmentAnalysis
     {
         static void Main(string[] args)
         {
-            //var spark = SparkSession
-            //    .Builder()
-            //    .AppName("Sentiment Analysis with Spark")
-            //    .GetOrCreate();
+            var spark = SparkSession
+                .Builder()
+                .AppName("Sentiment Analysis with Spark")
+                .GetOrCreate();
 
-            //// Create initial DataFrame
-            //DataFrame df = spark
-            //    .Read()
-            //    .Option("header", true)
-            //    .Option("inferSchema", true)
-            //    .Csv("tweets_clean_data.csv");
+            // Create initial DataFrame
+            DataFrame df = spark
+                .Read()
+                .Option("header", true)
+                .Option("inferSchema", true)
+                .Csv("tweets_clean_data.csv");
 
-            //df.Show();
+            df.Show();
 
-            //df.CreateOrReplaceTempView("TweetsTextView");
+            df.CreateOrReplaceTempView("TweetsTextView");
 
-            //spark.Stop();
+            spark.Udf().Register<string, bool>("SentimentAnalysisFunc", (text) => Sentiment(text));
 
-            // Count words
+            var sqlDf = spark.Sql("SELECT * FROM TweetsTextView");
 
-            Console.WriteLine(Sentiment("== OK! ==  IM GOING TO VANDALIZE WILD ONES WIKI THEN!!!"));
+            spark.Stop();
 
-            Console.ReadLine();
         }
 
         public static bool Sentiment(string text)
