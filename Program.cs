@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.ML;
+using System.Collections.Generic;
 using Microsoft.Spark.Sql;
+using static Microsoft.Spark.Sql.Functions;
 using SentimentAnalysisML.Model;
 
 namespace SentinmentAnalysis
@@ -27,21 +28,22 @@ namespace SentinmentAnalysis
 
             spark.Udf().Register<string, bool>("SentimentAnalysisFunc", (text) => Sentiment(text));
 
-            var sqlDf = spark.Sql("SELECT * FROM TweetsTextView");
+            var sqlDf = spark.Sql("SELECT text, SentimentAnalysisFunc(text) FROM TweetsTextView");
+            sqlDf.Show();
 
             spark.Stop();
-
         }
 
         public static bool Sentiment(string text)
         {
-            ModelInput modelInput = new ModelInput
-            {
-                SentimentText = text
-            };
+            // ModelInput modelInput = new ModelInput
+            // {
+            //     SentimentText = text
+            // };
 
-            ModelOutput result = ConsumeModel.Predict(modelInput);
-            return result.Prediction;
+            // ModelOutput result = ConsumeModel.Predict(modelInput);
+            // return result.Prediction;
+            return true;
         }
     }
 }
